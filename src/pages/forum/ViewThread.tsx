@@ -16,21 +16,25 @@ export function ViewThread() {
 
   if (threadLoading || commentsLoading) {
     return (
-      <ForumLayout>
-        <div className="flex justify-center items-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
-        </div>
-      </ForumLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <ForumLayout>
+          <div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+          </div>
+        </ForumLayout>
+      </div>
     );
   }
 
   if (threadError || !thread) {
     return (
-      <ForumLayout>
-        <div className="text-center py-8">
-          <p className="text-red-600">Failed to load discussion</p>
-        </div>
-      </ForumLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <ForumLayout>
+          <div className="text-center py-8">
+            <p className="text-red-600">Failed to load discussion</p>
+          </div>
+        </ForumLayout>
+      </div>
     );
   }
 
@@ -40,23 +44,33 @@ export function ViewThread() {
   };
 
   return (
-    <ForumLayout>
-      <div className="space-y-8">
-        <ThreadContent thread={thread} />
-        <div className="bg-white shadow rounded-lg">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Comments</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <ForumLayout>
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
+            <ThreadContent thread={thread} />
           </div>
-          <CommentForm onSubmit={handleComment} loading={commentSubmitting} />
-          {commentsError ? (
-            <div className="p-6 text-center">
-              <p className="text-red-600">Failed to load comments</p>
+          
+          <div className="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
+            <div className="p-8 border-b border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                Discussion
+                <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  {comments?.length || 0} replies
+                </span>
+              </h2>
             </div>
-          ) : (
-            <CommentList comments={comments || []} />
-          )}
+            <CommentForm onSubmit={handleComment} loading={commentSubmitting} />
+            {commentsError ? (
+              <div className="p-8 text-center">
+                <p className="text-red-600">Failed to load comments</p>
+              </div>
+            ) : (
+              <CommentList comments={comments || []} />
+            )}
+          </div>
         </div>
-      </div>
-    </ForumLayout>
+      </ForumLayout>
+    </div>
   );
 }
