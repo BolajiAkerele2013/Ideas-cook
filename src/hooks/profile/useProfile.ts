@@ -7,31 +7,31 @@ export function useProfile(userId?: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchProfile = async () => {
     if (!userId) {
       setLoading(false);
       return;
     }
 
-    async function fetchProfile() {
-      try {
-        const { data, error: fetchError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single();
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-        if (fetchError) throw fetchError;
-        setProfile(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load profile');
-      } finally {
-        setLoading(false);
-      }
+      if (fetchError) throw fetchError;
+      setProfile(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load profile');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchProfile();
   }, [userId]);
 
-  return { profile, loading, error };
+  return { profile, loading, error, refresh: fetchProfile };
 }

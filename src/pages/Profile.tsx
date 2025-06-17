@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserCircle, Edit, Camera } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserIdeasGrid } from '../components/dashboard/UserIdeasGrid';
 import { ProfileInfo } from '../components/profile/ProfileInfo';
+import { ProfileEditForm } from '../components/profile/ProfileEditForm';
 import { useProfile } from '../hooks/profile/useProfile';
 
 export function Profile() {
   const { user } = useAuth();
-  const { profile, loading, error } = useProfile(user?.id);
+  const { profile, loading, error, refresh } = useProfile(user?.id);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   if (loading) {
     return (
@@ -29,6 +31,8 @@ export function Profile() {
     );
   }
 
+  const displayName = profile.full_name || `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.username;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section with Cover Photo */}
@@ -49,7 +53,7 @@ export function Profile() {
               {profile.avatar_url ? (
                 <img
                   src={profile.avatar_url}
-                  alt={profile.username}
+                  alt={displayName}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -58,7 +62,10 @@ export function Profile() {
                 </div>
               )}
             </div>
-            <button className="absolute bottom-2 right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg">
+            <button 
+              onClick={() => setShowEditForm(true)}
+              className="absolute bottom-2 right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg"
+            >
               <Camera className="h-4 w-4" />
             </button>
           </div>
@@ -69,14 +76,15 @@ export function Profile() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
         {/* Profile Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{profile.full_name || profile.username}</h1>
-          {profile.full_name && (
-            <p className="text-xl text-gray-600 mb-4">@{profile.username}</p>
-          )}
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{displayName}</h1>
+          <p className="text-xl text-gray-600 mb-4">{profile.username}</p>
           {profile.bio && (
             <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">{profile.bio}</p>
           )}
-          <button className="mt-6 inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg">
+          <button 
+            onClick={() => setShowEditForm(true)}
+            className="mt-6 inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg"
+          >
             <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </button>
@@ -98,6 +106,15 @@ export function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Edit Form Modal */}
+      {showEditForm && (
+        <ProfileEditForm
+          profile={profile}
+          onClose={() => setShowEditForm(false)}
+          onUpdate={refresh}
+        />
+      )}
     </div>
   );
 }

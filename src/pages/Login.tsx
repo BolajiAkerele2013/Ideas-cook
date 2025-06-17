@@ -41,7 +41,7 @@ export function Login() {
             </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-gray-600">Sign in to your account to continue</p>
+          <p className="mt-2 text-gray-600">Sign in with your email address</p>
         </div>
 
         {/* Form */}
