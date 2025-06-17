@@ -20,7 +20,6 @@ export function ProfileInfo({ profile }: ProfileInfoProps) {
         ) : (
           <UserCircle className="h-24 w-24 text-gray-400 mx-auto" />
         )}
-        <h2 className="mt-4 text-xl font-semibold text-gray-900">{profile.username}</h2>
         {profile.full_name && (
           <p className="text-gray-600">{profile.full_name}</p>
         )}
