@@ -1,0 +1,70 @@
+name: cook_ideas
+description: A mobile app for the Cook.ideas platform - Create, manage, and collaborate on ideas.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI & Navigation
+  cupertino_icons: ^1.0.6
+  go_router: ^12.1.3
+  flutter_svg: ^2.0.9
+  cached_network_image: ^3.3.0
+  image_picker: ^1.0.4
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # Backend & API
+  supabase_flutter: ^2.0.0
+  http: ^1.1.0
+  
+  # Storage & Persistence
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+  
+  # UI Components
+  flutter_staggered_grid_view: ^0.7.0
+  shimmer: ^3.0.0
+  pull_to_refresh: ^2.0.0
+  
+  # Utils
+  intl: ^0.19.0
+  uuid: ^4.1.0
+  url_launcher: ^6.2.1
+  file_picker: ^6.1.1
+  
+  # Animations
+  lottie: ^2.7.0
+  animations: ^2.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/icons/
+  
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
