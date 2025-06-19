@@ -52,6 +52,21 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get current route to set the correct tab index
+    final location = GoRouterState.of(context).uri.path;
+    
+    if (location.startsWith('/ideas')) {
+      _currentIndex = 1;
+    } else if (location.startsWith('/forum')) {
+      _currentIndex = 2;
+    } else if (location.startsWith('/messages')) {
+      _currentIndex = 3;
+    } else if (location.startsWith('/profile')) {
+      _currentIndex = 4;
+    } else {
+      _currentIndex = 0;
+    }
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
