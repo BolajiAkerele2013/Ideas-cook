@@ -58,7 +58,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
       final List<Map<String, dynamic>> allIdeas = [];
       
       // Add own ideas
-      for (final idea in ownIdeasResult.data) {
+      for (final idea in ownIdeasResult) {
         allIdeas.add({
           ...idea,
           'user_role': 'owner',
@@ -67,7 +67,7 @@ class _IdeasScreenState extends State<IdeasScreen> {
       }
       
       // Add member ideas (avoid duplicates)
-      for (final member in memberIdeasResult.data) {
+      for (final member in memberIdeasResult) {
         final idea = member['ideas'];
         if (idea != null && !allIdeas.any((i) => i['id'] == idea['id'])) {
           allIdeas.add({
