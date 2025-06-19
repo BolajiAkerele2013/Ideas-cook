@@ -29,80 +29,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadDashboardData();
   }
 
-  Future<void> _loadDashboardData() async {
-    final user = context.read<AuthProvider>().user;
-    if (user == null) return;
+Future<void> _loadDashboardData() async {
+  final user = context.read<AuthProvider>().user;
+  if (user == null) return;
 
-    try {
-      final supabase = Supabase.instance.client;
+  try {
+    final supabase = Supabase.instance.client;
 
-      // Load user stats
-      final futures = await Future.wait([
-        // Count user's ideas
-        supabase
-            .from('ideas')
-            .select('id')
-            .eq('creator_id', user.id)
-            .count(CountOption.exact),
-        
-        // Count user's tasks
-        supabase
-            .from('tasks')
-            .select('id')
-            .eq('created_by', user.id)
-            .count(CountOption.exact),
-        
-        // Count user's forum posts
-        supabase
-            .from('forum_threads')
-            .select('id')
-            .eq('creator_id', user.id)
-            .count(CountOption.exact),
-        
-        // Get recent activity (ideas and forum posts)
-        supabase
-            .from('ideas')
-            .select('id, name, created_at')
-            .eq('creator_id', user.id)
-            .order('created_at', ascending: false)
-            .limit(3),
-      ]);
+    // Get counts first - properly typed as Future<PostgrestResponse>
+    final ideasCountFuture = supabase
+        .from('ideas')
+        .select('id')
+        .eq('creator_id', user.id)
+        .count(CountOption.exact);
+    
+    final tasksCountFuture = supabase
+        .from('tasks')
+        .select('id')
+        .eq('created_by', user.id)
+        .count(CountOption.exact);
+    
+    final forumCountFuture = supabase
+        .from('forum_threads')
+        .select('id')
+        .eq('creator_id', user.id)
+        .count(CountOption.exact);
 
-      final ideasCount = futures[0].count;
-      final tasksCount = futures[1].count;
-      final forumPostsCount = futures[2].count;
-      final recentIdeas = futures[3].data as List<dynamic>;
+    // Execute count queries together
+    final counts = await Future.wait([
+      ideasCountFuture,
+      tasksCountFuture,
+      forumCountFuture,
+    ]);
 
-      // Get conversation count
-      final conversationsResult = await supabase
-          .from('conversation_participants')
-          .select('conversation_id')
-          .eq('user_id', user.id)
-          .count(CountOption.exact);
+    // Get recent ideas separately
+    final recentIdeasResponse = await supabase
+        .from('ideas')
+        .select('id, name, created_at')
+        .eq('creator_id', user.id)
+        .order('created_at', ascending: false)
+        .limit(3);
 
-      setState(() {
-        stats = {
-          'ideas': ideasCount,
-          'tasks': tasksCount,
-          'messages': conversationsResult.count,
-          'forumPosts': forumPostsCount,
-        };
-        
-        recentActivity = recentIdeas.map((idea) => {
-          'type': 'idea',
-          'title': 'Created idea "${idea['name']}"',
-          'time': _formatTimeAgo(idea['created_at']),
-          'icon': Icons.lightbulb,
-        }).toList();
-        
-        loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        loading = false;
-      });
-    }
+    // Get conversation count
+    final conversationsResult = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', user.id)
+        .count(CountOption.exact);
+
+    setState(() {
+      stats = {
+        'ideas': counts[0].count,
+        'tasks': counts[1].count,
+        'messages': conversationsResult.count,
+        'forumPosts': counts[2].count,
+      };
+      
+      recentActivity = (recentIdeasResponse as List).map((idea) => {
+        'type': 'idea',
+        'title': 'Created idea "${idea['name']}"',
+        'time': _formatTimeAgo(idea['created_at']),
+        'icon': Icons.lightbulb,
+      }).toList();
+      
+      loading = false;
+    });
+  } catch (e) {
+    debugPrint('Error loading dashboard data: $e');
+    setState(() {
+      loading = false;
+    });
   }
+}
 
   String _formatTimeAgo(String dateString) {
     final date = DateTime.parse(dateString);
