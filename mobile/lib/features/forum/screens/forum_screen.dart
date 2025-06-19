@@ -40,7 +40,7 @@ class _ForumScreenState extends State<ForumScreen> {
           ''')
           .order('created_at', ascending: false);
 
-      final processedThreads = result.data.map((thread) {
+      final processedThreads = result.map((thread) {
         return {
           ...thread,
           'comment_count': thread['comment_count']?.isNotEmpty == true 
