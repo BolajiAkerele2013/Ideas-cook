@@ -57,16 +57,16 @@ class _ChatScreenState extends State<ChatScreen> {
           .eq('conversation_id', widget.conversationId)
           .neq('user_id', user.id);
 
-      final otherParticipants = participantsResult.data
+      final otherParticipants = participantsResult
           .map((p) => p['profiles'])
           .where((p) => p != null)
           .toList();
 
       setState(() {
         conversation = {
-          ...conversationResult.data,
+          ...conversationResult,
           'other_participants': otherParticipants,
-          'title': conversationResult.data['title'] ?? 
+          'title': conversationResult['title'] ?? 
               (otherParticipants.isNotEmpty 
                   ? otherParticipants.map((p) => p['username']).join(', ')
                   : 'Chat'),
@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .order('created_at', ascending: true);
 
       setState(() {
-        messages = result.data;
+        messages = result;
         loading = false;
       });
 
