@@ -53,7 +53,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
       final List<Map<String, dynamic>> processedConversations = [];
 
-      for (final item in result.data) {
+      for (final item in result) {
         final conversation = item['conversations'];
         if (conversation == null) continue;
 
@@ -72,13 +72,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
             .order('created_at', ascending: false)
             .limit(1);
 
-        final otherParticipants = participantsResult.data
+        final otherParticipants = participantsResult
             .map((p) => p['profiles'])
             .where((p) => p != null)
             .toList();
 
-        final latestMessage = latestMessageResult.data.isNotEmpty 
-            ? latestMessageResult.data.first 
+        final latestMessage = latestMessageResult.isNotEmpty 
+            ? latestMessageResult.first 
             : null;
 
         // Check if conversation has unread messages
