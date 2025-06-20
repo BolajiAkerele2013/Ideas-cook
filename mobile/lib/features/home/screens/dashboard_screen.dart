@@ -29,78 +29,85 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadDashboardData();
   }
 
-Future<void> _loadDashboardData() async {
-  final user = context.read<AuthProvider>().user;
-  if (user == null) return;
+  Future<void> _loadDashboardData() async {
+    final user = context.read<AuthProvider>().user;
+    if (user == null) return;
 
-  try {
-    final supabase = Supabase.instance.client;
+    try {
+      final supabase = Supabase.instance.client;
 
-    // Get counts first - properly typed as Future<PostgrestResponse>
-    final ideasCountFuture = supabase
-        .from('ideas')
-        .select('id')
-        .eq('creator_id', user.id)
-        .count(CountOption.exact);
-    
-    final tasksCountFuture = supabase
-        .from('tasks')
-        .select('id')
-        .eq('created_by', user.id)
-        .count(CountOption.exact);
-    
-    final forumCountFuture = supabase
-        .from('forum_threads')
-        .select('id')
-        .eq('creator_id', user.id)
-        .count(CountOption.exact);
+      // Get total ideas count (owned + member of)
+      final ownIdeasCount = await supabase
+          .from('ideas')
+          .select('id')
+          .eq('creator_id', user.id)
+          .count(CountOption.exact);
 
-    // Execute count queries together
-    final counts = await Future.wait([
-      ideasCountFuture,
-      tasksCountFuture,
-      forumCountFuture,
-    ]);
+      final memberIdeasCount = await supabase
+          .from('idea_members')
+          .select('idea_id')
+          .eq('user_id', user.id)
+          .count(CountOption.exact);
 
-    // Get recent ideas separately
-    final recentIdeasResponse = await supabase
-        .from('ideas')
-        .select('id, name, created_at')
-        .eq('creator_id', user.id)
-        .order('created_at', ascending: false)
-        .limit(3);
+      final totalIdeasCount = ownIdeasCount.count + memberIdeasCount.count;
 
-    // Get conversation count
-    final conversationsResult = await supabase
-        .from('conversation_participants')
-        .select('conversation_id')
-        .eq('user_id', user.id)
-        .count(CountOption.exact);
-
-    setState(() {
-      stats = {
-        'ideas': counts[0].count,
-        'tasks': counts[1].count,
-        'messages': conversationsResult.count,
-        'forumPosts': counts[2].count,
-      };
+      // Get other counts
+      final tasksCountFuture = supabase
+          .from('tasks')
+          .select('id')
+          .eq('created_by', user.id)
+          .count(CountOption.exact);
       
-      recentActivity = (recentIdeasResponse as List).map((idea) => {
-        'type': 'idea',
-        'title': 'Created idea "${idea['name']}"',
-        'time': _formatTimeAgo(idea['created_at']),
-        'icon': Icons.lightbulb,
-      }).toList();
-      
-      loading = false;
-    });
-  } catch (e) {
-    debugPrint('Error loading dashboard data: $e');
-    setState(() {
-      loading = false;
-    });
+      final forumCountFuture = supabase
+          .from('forum_threads')
+          .select('id')
+          .eq('creator_id', user.id)
+          .count(CountOption.exact);
+
+      final conversationsResult = await supabase
+          .from('conversation_participants')
+          .select('conversation_id')
+          .eq('user_id', user.id)
+          .count(CountOption.exact);
+
+      // Execute remaining count queries
+      final counts = await Future.wait([
+        tasksCountFuture,
+        forumCountFuture,
+      ]);
+
+      // Get recent ideas for activity
+      final recentIdeasResponse = await supabase
+          .from('ideas')
+          .select('id, name, created_at')
+          .eq('creator_id', user.id)
+          .order('created_at', ascending: false)
+          .limit(3);
+
+      setState(() {
+        stats = {
+          'ideas': totalIdeasCount,
+          'tasks': counts[0].count,
+          'messages': conversationsResult.count,
+          'forumPosts': counts[1].count,
+        };
+        
+        recentActivity = (recentIdeasResponse as List).map((idea) => {
+          'type': 'idea',
+          'title': 'Created idea "${idea['name']}"',
+          'time': _formatTimeAgo(idea['created_at']),
+          'icon': Icons.lightbulb,
+        }).toList();
+        
+        loading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading dashboard data: $e');
+      setState(() {
+        loading = false;
+      });
+    }
   }
-}
 
   String _formatTimeAgo(String dateString) {
     final date = DateTime.parse(dateString);

@@ -34,14 +34,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final supabase = Supabase.instance.client;
 
+      // Get total ideas count (owned + member of)
+      final ownIdeasCount = await supabase
+          .from('ideas')
+          .select('id')
+          .eq('creator_id', user.id)
+          .count(CountOption.exact);
+
+      final memberIdeasCount = await supabase
+          .from('idea_members')
+          .select('idea_id')
+          .eq('user_id', user.id)
+          .count(CountOption.exact);
+
+      final totalIdeasCount = ownIdeasCount.count + memberIdeasCount.count;
+
       final futures = await Future.wait([
-        // Count user's ideas
-        supabase
-            .from('ideas')
-            .select('id')
-            .eq('creator_id', user.id)
-            .count(CountOption.exact),
-        
         // Count user's forum posts
         supabase
             .from('forum_threads')
@@ -66,10 +74,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       setState(() {
         stats = {
-          'ideas': futures[0].count,
-          'posts': futures[1].count,
-          'tasks': futures[2].count,
-          'conversations': futures[3].count,
+          'ideas': totalIdeasCount,
+          'posts': futures[0].count,
+          'tasks': futures[1].count,
+          'conversations': futures[2].count,
         };
         loading = false;
       });
@@ -276,13 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _MenuItem(
                           icon: Icons.settings_outlined,
                           title: 'Settings',
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Settings coming soon!'),
-                              ),
-                            );
-                          },
+                          onTap: () => context.push('/profile/settings'),
                         ),
                         _MenuItem(
                           icon: Icons.help_outline,

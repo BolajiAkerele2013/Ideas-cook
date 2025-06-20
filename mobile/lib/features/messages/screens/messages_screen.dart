@@ -140,9 +140,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         title: const Text('Messages'),
         actions: [
           IconButton(
-            onPressed: () {
-              // TODO: Implement new conversation
-            },
+            onPressed: () => context.push('/messages/new'),
             icon: const Icon(Icons.add),
           ),
         ],
@@ -206,6 +204,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                   fontSize: 14,
                                   color: Colors.grey[500],
                                 ),
+                              ),
+                              const SizedBox(height: 24),
+                              ElevatedButton.icon(
+                                onPressed: () => context.push('/messages/new'),
+                                icon: const Icon(Icons.add),
+                                label: const Text('Start Conversation'),
                               ),
                             ],
                           ),

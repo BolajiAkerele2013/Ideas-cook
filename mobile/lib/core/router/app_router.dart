@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cook_ideas/features/auth/screens/login_screen.dart';
 import 'package:cook_ideas/features/auth/screens/register_screen.dart';
+import 'package:cook_ideas/features/auth/screens/forgot_password_screen.dart';
 import 'package:cook_ideas/features/home/screens/main_screen.dart';
 import 'package:cook_ideas/features/ideas/screens/create_idea_screen.dart';
 import 'package:cook_ideas/features/ideas/screens/idea_detail_screen.dart';
 import 'package:cook_ideas/features/ideas/screens/edit_idea_screen.dart';
 import 'package:cook_ideas/features/profile/screens/profile_screen.dart';
 import 'package:cook_ideas/features/profile/screens/edit_profile_screen.dart';
+import 'package:cook_ideas/features/profile/screens/settings_screen.dart';
 import 'package:cook_ideas/features/forum/screens/forum_screen.dart';
 import 'package:cook_ideas/features/forum/screens/create_thread_screen.dart';
 import 'package:cook_ideas/features/forum/screens/thread_detail_screen.dart';
 import 'package:cook_ideas/features/messages/screens/messages_screen.dart';
 import 'package:cook_ideas/features/messages/screens/chat_screen.dart';
+import 'package:cook_ideas/features/messages/screens/new_conversation_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -41,6 +44,10 @@ class AppRouter {
       GoRoute(
         path: '/auth/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/auth/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       
       // Main App Routes
@@ -92,6 +99,10 @@ class AppRouter {
         builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
+        path: '/profile/settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
         path: '/forum/create',
         builder: (context, state) => const CreateThreadScreen(),
       ),
@@ -100,6 +111,10 @@ class AppRouter {
         builder: (context, state) => ThreadDetailScreen(
           threadId: state.pathParameters['id']!,
         ),
+      ),
+      GoRoute(
+        path: '/messages/new',
+        builder: (context, state) => const NewConversationScreen(),
       ),
       GoRoute(
         path: '/messages/:id',
