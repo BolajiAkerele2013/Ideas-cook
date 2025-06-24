@@ -17,7 +17,7 @@ export function IdeaMembers({ ideaId }: IdeaMembersProps) {
   const { user } = useAuth();
   
   const canManageRoles = user?.id === idea?.creator_id || 
-    members?.some(m => m.user_id === user?.id && m.role === 'equity_owner');
+    members?.some(m => m.user_id === user?.id && (m.role === 'owner' || m.role === 'equity_owner'));
 
   if (loading) {
     return (
