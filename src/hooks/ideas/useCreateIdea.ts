@@ -17,18 +17,41 @@ export function useCreateIdea() {
     setError(null);
 
     try {
-      const { error: insertError } = await supabase.from('ideas').insert([
-        {
-          creator_id: user.id,
-          name: formData.get('name'),
-          description: formData.get('description'),
-          problem_category: formData.get('problemCategory'),
-          solution: formData.get('solution'),
-          visibility: formData.get('visibility') === 'true',
-        },
-      ]);
+      // Insert the idea and return its ID
+      const { data: ideaInsertData, error: insertError } = await supabase
+        .from('ideas')
+        .insert([
+          {
+            creator_id: user.id,
+            name: formData.get('name'),
+            description: formData.get('description'),
+            problem_category: formData.get('problemCategory'),
+            solution: formData.get('solution'),
+            visibility: formData.get('visibility') === 'true',
+          },
+        ])
+        .select('id');
 
-      if (insertError) throw insertError;
+      if (insertError || !ideaInsertData || ideaInsertData.length === 0) {
+        throw insertError || new Error('Idea creation failed');
+      }
+
+      const newIdeaId = ideaInsertData[0].id;
+
+      // Insert the creator as a member with 100% equity
+      const { error: memberInsertError } = await supabase
+        .from('idea_members')
+        .insert([
+          {
+            user_id: user.id,
+            idea_id: newIdeaId,
+            role: 'owner',
+            equity_percentage: 100,
+          },
+        ]);
+
+      if (memberInsertError) throw memberInsertError;
+
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create idea');
