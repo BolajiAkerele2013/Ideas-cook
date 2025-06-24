@@ -38,18 +38,26 @@ export function useAssignRole() {
         .eq('username', email)
         .single();
 
-      if (userError || !userData) throw new Error(userError?.message || 'User not found');
+      if (userError || !userData) {
+        setError('Recipient not found. Please check the email address.');
+        return false;
+      }
 
       if (userData.id === user.id) throw new Error("You cannot assign equity to yourself");
 
       const { data: senderData, error: senderError } = await supabase
         .from('idea_members')
-        .select('equity_percentage')
+        .select('equity_percentage, role')
         .eq('idea_id', ideaId)
         .eq('user_id', user.id)
         .single();
 
       const senderEquity = senderData?.equity_percentage ?? 0;
+      const senderRole = senderData?.role ?? '';
+
+      if (!(senderRole === 'owner' || senderRole === 'equity_owner')) {
+        throw new Error("You do not have permission to assign equity");
+      }
 
       if (!senderEquity || senderEquity <= 0) throw new Error("You don't have any equity to assign");
 
