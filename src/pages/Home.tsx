@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Sparkles, ArrowRight, Users, Lightbulb, TrendingUp } from 'lucide-react';
+import { Sparkles, ArrowRight, Users, Lightbulb, TrendingUp, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Home() {
@@ -161,6 +161,79 @@ export function Home() {
           )}
         </div>
       </div>
+
+      {/* Footer with User Guide Link */}
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                  <Lightbulb className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-gray-900">Bezael.com</span>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Empowering innovators to turn their ideas into reality through collaboration, management, and execution.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Platform</h3>
+              <ul className="space-y-3">
+                <li>
+                  <Link to="/forum" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    Community Forum
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/ideas/create" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    Create Idea
+                  </Link>
+                </li>
+                {user && (
+                  <li>
+                    <Link to="/messages" className="text-gray-600 hover:text-blue-600 transition-colors">
+                      Messages
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Support</h3>
+              <ul className="space-y-3">
+                <li>
+                  <Link 
+                    to="/user-guide" 
+                    className="flex items-center text-gray-600 hover:text-blue-600 transition-colors group"
+                  >
+                    <BookOpen className="h-4 w-4 mr-2 group-hover:text-blue-600" />
+                    User Guide
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    Contact Support
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <p className="text-center text-gray-500 text-sm">
+              © 2025 Bezael.com. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

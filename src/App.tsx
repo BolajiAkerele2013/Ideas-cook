@@ -13,6 +13,7 @@ import { ForumHome } from './pages/forum/ForumHome';
 import { CreateThread } from './pages/forum/CreateThread';
 import { ViewThread } from './pages/forum/ViewThread';
 import { Messages } from './pages/messages/Messages';
+import { UserGuide } from './pages/UserGuide';
 import { AuthProvider } from './contexts/AuthContext';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/forum/thread/:id" element={<ViewThread />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/messages/:id" element={<Messages />} />
+            <Route path="/user-guide" element={<UserGuide />} />
           </Routes>
         </Layout>
       </AuthProvider>
