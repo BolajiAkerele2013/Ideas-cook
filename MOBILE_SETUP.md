@@ -1,10 +1,10 @@
 # Flutter Mobile App Setup Instructions
 
-This document provides step-by-step instructions to set up and run the Cook.ideas Flutter mobile app.
+This document provides step-by-step instructions to set up and run the Bezael.com Flutter mobile app.
 
 ## 📱 Complete Flutter Mobile App Created!
 
-I've created a comprehensive Flutter mobile application for your Cook.ideas platform with the following features:
+I've created a comprehensive Flutter mobile application for your Bezael.com platform with the following features:
 
 ### ✨ Key Features
 

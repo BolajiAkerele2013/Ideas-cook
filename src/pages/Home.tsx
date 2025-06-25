@@ -22,7 +22,7 @@ export function Home() {
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Build your dreams with{' '}
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Cook.ideas
+                Bezael.com
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">

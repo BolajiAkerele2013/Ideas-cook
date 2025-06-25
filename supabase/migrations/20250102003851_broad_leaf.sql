@@ -1,5 +1,5 @@
 /*
-  # Initial Schema Setup for Cook.ideas Platform
+  # Initial Schema Setup for Bezael.com Platform
 
   1. New Tables
     - `profiles`
