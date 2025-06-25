@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Users, 
-  DollarSign, 
-  FileText, 
-  BarChart3, 
-  Kanban,
-  FileShield,
-  Plus
-} from 'lucide-react';
+import { Users, DollarSign, FileText, BarChart3, Kanban, Shield as FileShield, Plus } from 'lucide-react';
 import { IdeaMembers } from './IdeaMembers';
 import { FinanceBoard } from './finance/FinanceBoard';
 import { DocumentsBoard } from './documents/DocumentsBoard';
