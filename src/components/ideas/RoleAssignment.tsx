@@ -10,6 +10,15 @@ const ROLES = [
   'viewer'
 ];
 
+const REPAYMENT_MODES = [
+  'lump_sum',
+  'monthly_installments',
+  'quarterly_installments',
+  'annual_installments',
+  'revenue_based',
+  'equity_conversion'
+];
+
 interface RoleAssignmentProps {
   ideaId: string;
   onAssigned: () => void;
@@ -20,6 +29,10 @@ export function RoleAssignment({ ideaId, onAssigned }: RoleAssignmentProps) {
   const [role, setRole] = useState('');
   const [equity, setEquity] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
+  const [debtAmount, setDebtAmount] = useState('');
+  const [debtDate, setDebtDate] = useState('');
+  const [repaymentMode, setRepaymentMode] = useState('');
+  const [fullRepaymentDate, setFullRepaymentDate] = useState('');
   const { assignRole, loading, error } = useAssignRole();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,6 +43,10 @@ export function RoleAssignment({ ideaId, onAssigned }: RoleAssignmentProps) {
       role,
       equityPercentage: role === 'equity_owner' ? Number(equity) : undefined,
       expiresAt: role === 'contractor' ? expiresAt : undefined,
+      debtAmount: role === 'debt_financier' ? Number(debtAmount) : undefined,
+      debtDate: role === 'debt_financier' ? debtDate : undefined,
+      repaymentMode: role === 'debt_financier' ? repaymentMode : undefined,
+      fullRepaymentDate: role === 'debt_financier' ? fullRepaymentDate : undefined,
     });
 
     if (success) {
@@ -37,6 +54,10 @@ export function RoleAssignment({ ideaId, onAssigned }: RoleAssignmentProps) {
       setRole('');
       setEquity('');
       setExpiresAt('');
+      setDebtAmount('');
+      setDebtDate('');
+      setRepaymentMode('');
+      setFullRepaymentDate('');
       onAssigned();
     }
   };
@@ -76,8 +97,6 @@ export function RoleAssignment({ ideaId, onAssigned }: RoleAssignmentProps) {
             type="number"
             value={equity}
             onChange={(e) => setEquity(e.target.value)}
-            min="0"
-            max="100"
           />
         )}
 
@@ -88,8 +107,56 @@ export function RoleAssignment({ ideaId, onAssigned }: RoleAssignmentProps) {
             type="date"
             value={expiresAt}
             onChange={(e) => setExpiresAt(e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
+            required={false}
           />
+        )}
+
+        {role === 'debt_financier' && (
+          <>
+            <FormInput
+              id="debtAmount"
+              label="Debt Amount"
+              type="number"
+              value={debtAmount}
+              onChange={(e) => setDebtAmount(e.target.value)}
+            />
+
+            <FormInput
+              id="debtDate"
+              label="Date of Debt"
+              type="date"
+              value={debtDate}
+              onChange={(e) => setDebtDate(e.target.value)}
+            />
+
+            <div>
+              <label htmlFor="repaymentMode" className="block text-sm font-medium text-gray-700">
+                Mode of Repayment
+              </label>
+              <select
+                id="repaymentMode"
+                required
+                value={repaymentMode}
+                onChange={(e) => setRepaymentMode(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="">Select repayment mode</option>
+                {REPAYMENT_MODES.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {mode.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <FormInput
+              id="fullRepaymentDate"
+              label="Date of Full Repayment"
+              type="date"
+              value={fullRepaymentDate}
+              onChange={(e) => setFullRepaymentDate(e.target.value)}
+            />
+          </>
         )}
 
         <button

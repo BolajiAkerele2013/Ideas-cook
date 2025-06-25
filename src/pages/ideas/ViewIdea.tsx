@@ -26,6 +26,11 @@ export function ViewIdea() {
     );
   }
 
+  const handleUpdate = () => {
+    // Refresh the idea data if needed
+    window.location.reload();
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-8">
       <IdeaHeader idea={idea} />
@@ -33,7 +38,7 @@ export function ViewIdea() {
       <div className="mt-8 grid gap-8 md:grid-cols-3">
         <div className="md:col-span-2">
           <IdeaDetails idea={idea} />
-          <IdeaManagementTabs ideaId={idea.id} />
+          <IdeaManagementTabs ideaId={idea.id} onUpdate={handleUpdate} />
         </div>
         <div className="md:col-span-1">
           <IdeaMembers ideaId={idea.id} />

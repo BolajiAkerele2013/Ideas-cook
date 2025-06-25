@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export function useIdeaPermissions(ideaId: string) {
   const [canWrite, setCanWrite] = useState(false);
+  const [canManageFinances, setCanManageFinances] = useState(false);
+  const [canEditIdea, setCanEditIdea] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -11,6 +13,8 @@ export function useIdeaPermissions(ideaId: string) {
     async function checkPermissions() {
       if (!user) {
         setCanWrite(false);
+        setCanManageFinances(false);
+        setCanEditIdea(false);
         setLoading(false);
         return;
       }
@@ -25,11 +29,13 @@ export function useIdeaPermissions(ideaId: string) {
 
         if (idea?.creator_id === user.id) {
           setCanWrite(true);
+          setCanManageFinances(true);
+          setCanEditIdea(true);
           setLoading(false);
           return;
         }
 
-        // Check if user has write permission through role
+        // Check if user has permission through role
         const { data: member } = await supabase
           .from('idea_members')
           .select('role')
@@ -37,13 +43,17 @@ export function useIdeaPermissions(ideaId: string) {
           .eq('user_id', user.id)
           .single();
 
-        setCanWrite(
-          member?.role === 'owner' ||
-          member?.role === 'equity_owner' ||
-          member?.role === 'contractor'
-        );
+        const writeRoles = ['owner', 'equity_owner', 'contractor'];
+        const financeRoles = ['owner', 'equity_owner'];
+        const editRoles = ['owner', 'equity_owner'];
+
+        setCanWrite(writeRoles.includes(member?.role || ''));
+        setCanManageFinances(financeRoles.includes(member?.role || ''));
+        setCanEditIdea(editRoles.includes(member?.role || ''));
       } catch (error) {
         setCanWrite(false);
+        setCanManageFinances(false);
+        setCanEditIdea(false);
       } finally {
         setLoading(false);
       }
@@ -52,5 +62,5 @@ export function useIdeaPermissions(ideaId: string) {
     checkPermissions();
   }, [ideaId, user]);
 
-  return { canWrite, loading };
+  return { canWrite, canManageFinances, canEditIdea, loading };
 }
