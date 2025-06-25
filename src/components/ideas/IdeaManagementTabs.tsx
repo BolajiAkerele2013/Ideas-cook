@@ -10,14 +10,14 @@ import { DebtFinancierForm } from './DebtFinancierForm';
 import { useIdeaPermissions } from '../../hooks/ideas/useIdeaPermissions';
 
 interface IdeaManagementTabsProps {
-  idea: any;
+  ideaId: string;
   onUpdate: () => void;
 }
 
-export function IdeaManagementTabs({ idea, onUpdate }: IdeaManagementTabsProps) {
+export function IdeaManagementTabs({ ideaId, onUpdate }: IdeaManagementTabsProps) {
   const [activeTab, setActiveTab] = useState('tasks');
   const [showDebtForm, setShowDebtForm] = useState(false);
-  const { canManageFinances, canEditIdea } = useIdeaPermissions(idea.id);
+  const { canManageFinances, canEditIdea } = useIdeaPermissions(ideaId);
 
   const tabs = [
     { id: 'tasks', label: 'Tasks', icon: Kanban },
@@ -31,7 +31,7 @@ export function IdeaManagementTabs({ idea, onUpdate }: IdeaManagementTabsProps) 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'tasks':
-        return <KanbanBoard ideaId={idea.id} />;
+        return <KanbanBoard ideaId={ideaId} />;
       case 'team':
         return (
           <div className="space-y-6">
@@ -46,17 +46,17 @@ export function IdeaManagementTabs({ idea, onUpdate }: IdeaManagementTabsProps) 
                 </button>
               </div>
             )}
-            <IdeaMembers ideaId={idea.id} onUpdate={onUpdate} />
+            <IdeaMembers ideaId={ideaId} onUpdate={onUpdate} />
           </div>
         );
       case 'finance':
-        return <FinanceBoard ideaId={idea.id} />;
+        return <FinanceBoard ideaId={ideaId} />;
       case 'documents':
-        return <DocumentsBoard ideaId={idea.id} />;
+        return <DocumentsBoard ideaId={ideaId} />;
       case 'metrics':
-        return <MetricsDashboard ideaId={idea.id} />;
+        return <MetricsDashboard ideaId={ideaId} />;
       case 'nda':
-        return <NDATab ideaId={idea.id} canEdit={canEditIdea} />;
+        return <NDATab ideaId={ideaId} canEdit={canEditIdea} />;
       default:
         return null;
     }
@@ -97,7 +97,7 @@ export function IdeaManagementTabs({ idea, onUpdate }: IdeaManagementTabsProps) 
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <DebtFinancierForm
-              ideaId={idea.id}
+              ideaId={ideaId}
               onSuccess={() => {
                 setShowDebtForm(false);
                 onUpdate();
