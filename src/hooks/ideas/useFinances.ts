@@ -15,52 +15,52 @@ export function useFinances(ideaId: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchFinances() {
-      try {
-        // Fetch transactions
-        const { data: transactions, error: transactionError } = await supabase
-          .from('transactions')
-          .select('*')
-          .eq('idea_id', ideaId)
-          .order('date', { ascending: false });
+  const fetchFinances = async () => {
+    try {
+      // Fetch transactions
+      const { data: transactions, error: transactionError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('idea_id', ideaId)
+        .order('date', { ascending: false });
 
-        if (transactionError) throw transactionError;
+      if (transactionError) throw transactionError;
 
-        // Fetch invoices
-        const { data: invoices, error: invoiceError } = await supabase
-          .from('invoices')
-          .select('*')
-          .eq('idea_id', ideaId)
-          .order('created_at', { ascending: false });
+      // Fetch invoices
+      const { data: invoices, error: invoiceError } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('idea_id', ideaId)
+        .order('created_at', { ascending: false });
 
-        if (invoiceError) throw invoiceError;
+      if (invoiceError) throw invoiceError;
 
-        // Calculate totals
-        const totalIncome = transactions
-          ?.filter(t => t.type === 'income')
-          .reduce((sum, t) => sum + t.amount, 0) || 0;
+      // Calculate totals
+      const totalIncome = transactions
+        ?.filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0) || 0;
 
-        const totalExpenses = transactions
-          ?.filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + t.amount, 0) || 0;
+      const totalExpenses = transactions
+        ?.filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0) || 0;
 
-        setFinances({
-          transactions: transactions || [],
-          invoices: invoices || [],
-          totalIncome,
-          totalExpenses,
-          balance: totalIncome - totalExpenses
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load financial data');
-      } finally {
-        setLoading(false);
-      }
+      setFinances({
+        transactions: transactions || [],
+        invoices: invoices || [],
+        totalIncome,
+        totalExpenses,
+        balance: totalIncome - totalExpenses
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load financial data');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchFinances();
   }, [ideaId]);
 
-  return { finances, loading, error };
+  return { finances, loading, error, refresh: fetchFinances };
 }

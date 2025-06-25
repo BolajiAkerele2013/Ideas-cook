@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { UserCircle, Plus } from 'lucide-react';
 import { useIdeaMembers } from '../../hooks/ideas/useIdeaMembers';
+import { useIdeaPermissions } from '../../hooks/ideas/useIdeaPermissions';
 import { RoleAssignment } from './RoleAssignment';
+import { MemberRemovalButton } from './MemberRemovalButton';
 import { formatRoleLabel } from '../../utils/format';
 import { useAuth } from '../../contexts/AuthContext';
 import { useIdea } from '../../hooks/ideas/useIdea';
 
 interface IdeaMembersProps {
   ideaId: string;
+  onUpdate: () => void;
 }
 
-export function IdeaMembers({ ideaId }: IdeaMembersProps) {
+export function IdeaMembers({ ideaId, onUpdate }: IdeaMembersProps) {
   const [showAssign, setShowAssign] = useState(false);
   const { members, loading, error, refresh } = useIdeaMembers(ideaId);
+  const { canEditIdea } = useIdeaPermissions(ideaId);
   const { idea } = useIdea(ideaId);
   const { user } = useAuth();
   
@@ -35,12 +39,17 @@ export function IdeaMembers({ ideaId }: IdeaMembersProps) {
     );
   }
 
+  const handleMemberRemoved = () => {
+    refresh();
+    onUpdate();
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow">
         <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-900">Team Members</h3>
-          {canManageRoles && (
+          {canEditIdea && (
             <button
               onClick={() => setShowAssign(!showAssign)}
               className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900"
@@ -56,7 +65,7 @@ export function IdeaMembers({ ideaId }: IdeaMembersProps) {
           ) : (
             <ul className="divide-y divide-gray-200">
               {members?.map((member) => (
-                <li key={member.id} className="py-4">
+                <li key={member.id} className="py-4 relative">
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">
                       {member.profile.avatar_url ? (
@@ -90,6 +99,17 @@ export function IdeaMembers({ ideaId }: IdeaMembersProps) {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Show removal button for viewers and contractors if user can edit */}
+                  {canEditIdea && (member.role === 'viewer' || member.role === 'contractor') && (
+                    <MemberRemovalButton
+                      membershipId={member.id}
+                      memberName={member.profile.username}
+                      memberRole={member.role}
+                      canRemove={true}
+                      onRemoved={handleMemberRemoved}
+                    />
+                  )}
                 </li>
               ))}
             </ul>
@@ -97,12 +117,13 @@ export function IdeaMembers({ ideaId }: IdeaMembersProps) {
         </div>
       </div>
 
-      {showAssign && canManageRoles && (
+      {showAssign && canEditIdea && (
         <RoleAssignment 
           ideaId={ideaId} 
           onAssigned={() => {
             setShowAssign(false);
             refresh();
+            onUpdate();
           }} 
         />
       )}

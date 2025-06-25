@@ -1,16 +1,29 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useIdea } from '../../hooks/ideas/useIdea';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNDA } from '../../hooks/ideas/useNDA';
+import { useIdeaMembers } from '../../hooks/ideas/useIdeaMembers';
 import { IdeaHeader } from '../../components/ideas/IdeaHeader';
 import { IdeaDetails } from '../../components/ideas/IdeaDetails';
 import { IdeaMembers } from '../../components/ideas/IdeaMembers';
 import { IdeaManagementTabs } from '../../components/ideas/IdeaManagementTabs';
+import { NDAModal } from '../../components/ideas/NDAModal';
 
 export function ViewIdea() {
   const { id } = useParams();
-  const { idea, loading, error } = useIdea(id);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { idea, loading: ideaLoading, error: ideaError } = useIdea(id);
+  const { members, loading: membersLoading } = useIdeaMembers(id!);
+  const { nda, hasAccepted, loading: ndaLoading, refetch } = useNDA(id!);
 
-  if (loading) {
+  // Check if current user is a contractor for this idea
+  const userMembership = members?.find(member => member.user_id === user?.id);
+  const isContractor = userMembership?.role === 'contractor';
+  const needsNDAAcceptance = isContractor && !hasAccepted;
+
+  if (ideaLoading || membersLoading || ndaLoading) {
     return (
       <div className="flex justify-center items-center h-48">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
@@ -18,7 +31,7 @@ export function ViewIdea() {
     );
   }
 
-  if (error || !idea) {
+  if (ideaError || !idea) {
     return (
       <div className="text-center py-8">
         <p className="text-red-600">Failed to load idea</p>
@@ -31,6 +44,27 @@ export function ViewIdea() {
     window.location.reload();
   };
 
+  const handleNDAAccept = () => {
+    refetch();
+  };
+
+  const handleNDADecline = () => {
+    navigate('/profile');
+  };
+
+  // If user is a contractor and hasn't accepted NDA, show only NDA modal
+  if (needsNDAAcceptance) {
+    return (
+      <NDAModal
+        ideaId={idea.id}
+        ideaName={idea.name}
+        isOpen={true}
+        onAccept={handleNDAAccept}
+        onDecline={handleNDADecline}
+      />
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto py-8">
       <IdeaHeader idea={idea} />
@@ -41,7 +75,7 @@ export function ViewIdea() {
           <IdeaManagementTabs ideaId={idea.id} onUpdate={handleUpdate} />
         </div>
         <div className="md:col-span-1">
-          <IdeaMembers ideaId={idea.id} />
+          <IdeaMembers ideaId={idea.id} onUpdate={handleUpdate} />
         </div>
       </div>
     </div>
